@@ -7,7 +7,7 @@
       "target": "/processor/$1",
       "destination": "sflight-srv",
       "authenticationType": "xsuaa",
-      "csrfProtection": false
+      "csrfProtection": true
     },
     {
       "source": "^(.*)$",

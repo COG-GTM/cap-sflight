@@ -4,7 +4,11 @@ set -e
 cd "$(dirname "$(npm root)")"
 DIR="$(pwd)/.github"
 
-npm install --no-save yaml
+# Pinned build-time tooling. Override only with a version that has been reviewed.
+YAML_VERSION="${YAML_VERSION:-2.9.1}"
+HTML5_APP_DEPLOYER_VERSION="${HTML5_APP_DEPLOYER_VERSION:-7.2.4}"
+
+npm install --no-save --ignore-scripts "yaml@$YAML_VERSION"
 
 function value() {
     node "$DIR/deployment/kyma/scripts/value.js" "$1"
@@ -39,8 +43,13 @@ for APP in app/*; do
         pushd >/dev/null "gen/$APP"
 
         node "$DIR/deployment/kyma/scripts/prepareUiFiles.js" $CLOUD_SERVICE $DESTINATIONS
-        npm install
-        npx ui5 build preload --clean-dest --config ui5-deploy.yaml --include-task=generateManifestBundle generateCachebusterInfo
+        if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+        else
+            echo "WARNING: no package-lock.json in $APP, dependency versions are not pinned" >&2
+            npm install --ignore-scripts
+        fi
+        ./node_modules/.bin/ui5 build preload --clean-dest --config ui5-deploy.yaml --include-task=generateManifestBundle generateCachebusterInfo
         cd dist
         rm manifest-bundle.zip
         mv *.zip "$DIR/gen/ui/resources"
@@ -59,9 +68,10 @@ echo
 cat >package.json <<EOF
 {
     "name": "ui-deployer",
-    "scripts": { "start": "node node_modules/@sap/html5-app-deployer/index.js" }
+    "scripts": { "start": "node node_modules/@sap/html5-app-deployer/index.js" },
+    "dependencies": { "@sap/html5-app-deployer": "$HTML5_APP_DEPLOYER_VERSION" }
 }
 EOF
 
-npm install @sap/html5-app-deployer
+npm install --ignore-scripts "@sap/html5-app-deployer@$HTML5_APP_DEPLOYER_VERSION"
 pack build $IMAGE --path . --buildpack gcr.io/paketo-buildpacks/nodejs --builder paketobuildpacks/builder-jammy-base

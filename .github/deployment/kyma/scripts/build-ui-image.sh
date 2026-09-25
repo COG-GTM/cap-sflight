@@ -4,7 +4,7 @@ set -e
 cd "$(dirname "$(npm root)")"
 DIR="$(pwd)/.github"
 
-npm install --no-save yaml
+npm install --no-save --ignore-scripts yaml
 
 function value() {
     node "$DIR/deployment/kyma/scripts/value.js" "$1"
@@ -39,7 +39,8 @@ for APP in app/*; do
         pushd >/dev/null "gen/$APP"
 
         node "$DIR/deployment/kyma/scripts/prepareUiFiles.js" $CLOUD_SERVICE $DESTINATIONS
-        npm install
+        npm install --ignore-scripts
+        npm rebuild --ignore-scripts=false esbuild unrs-resolver ui5-tooling-transpile
         npx ui5 build preload --clean-dest --config ui5-deploy.yaml --include-task=generateManifestBundle generateCachebusterInfo
         cd dist
         rm manifest-bundle.zip
@@ -63,5 +64,5 @@ cat >package.json <<EOF
 }
 EOF
 
-npm install @sap/html5-app-deployer
+npm install --ignore-scripts @sap/html5-app-deployer
 pack build $IMAGE --path . --buildpack gcr.io/paketo-buildpacks/nodejs --builder paketobuildpacks/builder-jammy-base

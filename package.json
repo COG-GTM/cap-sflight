@@ -11,7 +11,8 @@
   "scripts": {
     "lint": "npx eslint .",
     "start": "cds-serve",
-    "build:ui": "npm run build --prefix app/travel_analytics && npm run build --prefix app/travel_processor",
+    "build:ui": "npm run ts-typecheck --prefix app/travel_analytics && npm run build --prefix app/travel_analytics && npm run ts-typecheck --prefix app/travel_processor && npm run build --prefix app/travel_processor",
+    "rebuild:trusted": "npm rebuild --ignore-scripts=false better-sqlite3 esbuild unrs-resolver ui5-tooling-transpile puppeteer",
     "test": "jest",
     "test:mocha": "mocha",
     "travel-processor": "cds watch --open sap.fe.cap.travel/index.html?sap-ui-xx-viewCache=false",

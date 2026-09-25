@@ -37,8 +37,13 @@ npm i -g @sap/cds-dk
 In the root folder of your project, run
 ```
 npm ci
+npm run rebuild:trusted
 cds watch
 ```
+
+> Dependency install scripts are disabled via `.npmrc` (`ignore-scripts=true`).
+> `npm run rebuild:trusted` runs the install scripts of the few packages that
+> need them (native binaries, browser download for the UI tests).
 
 #### Accessing the SAP Fiori Apps
 
@@ -52,6 +57,7 @@ Open these links in your browser:
 In the root folder of your project, run
 ```
 npm ci
+npm run rebuild:trusted
 npm run build:ui
 mvn spring-boot:run
 ```

@@ -33,6 +33,7 @@ jobs:
         distribution: 'sapmachine'
 
     - run: npm ci
+    - run: npm run rebuild:trusted
 
     - name: Build with Maven
       run: mvn -B clean verify

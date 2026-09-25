@@ -23,6 +23,7 @@ mta_archives/
 # Other
 .DS_Store
 .npmrc
+!/.npmrc
 *.orig
 *.log
 

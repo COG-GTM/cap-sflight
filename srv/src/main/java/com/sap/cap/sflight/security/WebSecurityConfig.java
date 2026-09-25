@@ -22,4 +22,12 @@ public class WebSecurityConfig {
 				.build();
 	}
 
+	@Bean
+	@Order(2)
+	public SecurityFilterChain actuatorChain(HttpSecurity http) throws Exception {
+		return http.securityMatchers(s -> s.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/actuator/**"))) //
+				.csrf(c -> c.disable()).authorizeHttpRequests(a -> a.anyRequest().denyAll())
+				.build();
+	}
+
 }

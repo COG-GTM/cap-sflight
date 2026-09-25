@@ -1,10 +1,7 @@
 using { sap.fe.cap.travel as my } from '../db/schema';
 
-service AnalyticsService @(path:'/analytics') {
+service AnalyticsService @(path:'/analytics', requires: 'authenticated-user') {
 
-  // @(restrict: [
-  //   { grant: 'READ', to: 'authenticated-user'},
-  // ])
   @readonly
   entity Bookings as projection on my.Booking {
     @UI.Hidden: false

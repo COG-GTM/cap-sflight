@@ -86,7 +86,7 @@ jobs:
 
     - name: MTA build
       if: steps.cache.outputs.cache-hit != 'true'
-      run: npx mbt build -s ${{ inputs.mta-source-dir }} -t ${{ inputs.mtar-dir }} --mtar ${{ inputs.mtar-file }}
+      run: npx mbt@1.2.49 build -s ${{ inputs.mta-source-dir }} -t ${{ inputs.mtar-dir }} --mtar ${{ inputs.mtar-file }}
 
     - name: CF Deploy
       id: deploy

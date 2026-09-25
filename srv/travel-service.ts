@@ -90,7 +90,7 @@ export class TravelService extends cds.ApplicationService { init() {
     // action called on draft -> reject if not own draft
     const isDraft = req.target.name.endsWith('.drafts')
     if (!isDraft && existingDraft || isDraft && existingDraft?.InProcessByUser !== req.user.id)
-      throw req.reject(423, `The travel is locked by ${existingDraft.InProcessByUser}.`);
+      throw req.reject(423, `The travel is currently locked by another user. Please try again later.`);
   })
   this.on (acceptTravel, req => UPDATE (req.subject) .with ({ TravelStatus_code: TravelStatusCode.Accepted }))
   this.on (rejectTravel, req => UPDATE (req.subject) .with ({ TravelStatus_code: TravelStatusCode.Canceled }))

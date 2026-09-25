@@ -1,0 +1,7 @@
+# SHA-256 digest of the btp CLI tarball installed by install-btp-cli.sh
+# (btp-cli-linux-amd64-$BTP_CLI_VERSION.tar.gz from tools.hana.ondemand.com).
+#
+# Pin a digest by setting BTP_CLI_VERSION in the Dockerfile to that exact
+# version and putting the output of `sha256sum btp-cli-linux-amd64-<version>.tar.gz`
+# (the digest only) on a line below. While no digest is listed the install
+# still runs, but logs that the download is unverified.

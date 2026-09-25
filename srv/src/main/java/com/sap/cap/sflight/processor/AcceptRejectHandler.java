@@ -33,6 +33,7 @@ public class AcceptRejectHandler implements EventHandler {
 	private static final String TRAVEL_STATUS_OPEN = "O";
 	private static final String TRAVEL_STATUS_ACCEPTED = "A";
 	private static final String TRAVEL_STATUS_CANCELLED = "X";
+	private static final String DRAFT_LOCKED_MESSAGE = "The draft is currently locked by another user. Please try again later.";
 
 	private final PersistenceService persistenceService;
 	private final DraftService draftService;
@@ -109,11 +110,11 @@ public class AcceptRejectHandler implements EventHandler {
 	}
 
 	private void checkIfTravelIsLockedByAnotherUser(Travel travel, UserInfo userInfo) {
-		if (!travel.isActiveEntity() && travel.draftAdministrativeData() != null && !travel.draftAdministrativeData().inProcessByUser().equals(userInfo.getName())) {
-			throw new ServiceException(ErrorStatuses.UNAUTHORIZED, String.format("The draft is locked by %s.", travel.draftAdministrativeData().inProcessByUser()));
+		if (!travel.isActiveEntity() && travel.draftAdministrativeData() != null && !String.valueOf(userInfo.getName()).equals(travel.draftAdministrativeData().inProcessByUser())) {
+			throw new ServiceException(ErrorStatuses.UNAUTHORIZED, DRAFT_LOCKED_MESSAGE);
 		}
 		if (travel.isActiveEntity() && travel.draftAdministrativeData() != null) {
-			throw new ServiceException(ErrorStatuses.UNAUTHORIZED, String.format("The draft is locked by %s.", travel.draftAdministrativeData().inProcessByUser()));
+			throw new ServiceException(ErrorStatuses.UNAUTHORIZED, DRAFT_LOCKED_MESSAGE);
 		}
 	}
 }

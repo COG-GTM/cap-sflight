@@ -13,7 +13,7 @@ build-parameters:
       commands:
         # set 'CDS_ENV=node' to pick the 'node' build profile settings, defined in package.json
         - npm ci
-        - npx -p @sap/cds-dk cds build --profile production,node
+        - npx --no cds build --profile production,node
 
 modules:
   # --------------------- SERVER MODULE ------------------------

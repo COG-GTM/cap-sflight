@@ -12,7 +12,7 @@ build-parameters:
     - builder: custom
       commands:
         - npm ci
-        - npx -p @sap/cds-dk cds build --profile production,node # generates gen/db
+        - npx --no cds build --profile production,node # generates gen/db
 
 modules:
   # --------------------- SERVER MODULE ------------------------

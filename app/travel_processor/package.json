@@ -15,7 +15,7 @@
     "ts-typecheck": "tsc --noEmit",
     "prestart": "npm run ts-typecheck",
     "prebuild": "npm run ts-typecheck",
-    "deploy-config": "npx -p @sap/ux-ui5-tooling fiori add deploy-config cf"
+    "deploy-config": "npx --no fiori add deploy-config cf"
   },
   "keywords": [
     "ui5",

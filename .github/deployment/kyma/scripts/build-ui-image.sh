@@ -40,7 +40,7 @@ for APP in app/*; do
 
         node "$DIR/deployment/kyma/scripts/prepareUiFiles.js" $CLOUD_SERVICE $DESTINATIONS
         npm install
-        npx ui5 build preload --clean-dest --config ui5-deploy.yaml --include-task=generateManifestBundle generateCachebusterInfo
+        npx --no ui5 build preload --clean-dest --config ui5-deploy.yaml --include-task=generateManifestBundle generateCachebusterInfo
         cd dist
         rm manifest-bundle.zip
         mv *.zip "$DIR/gen/ui/resources"

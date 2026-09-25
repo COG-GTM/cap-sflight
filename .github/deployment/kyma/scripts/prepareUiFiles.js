@@ -75,7 +75,7 @@ function getPackageJsonInclude() {
             "rimraf": "3.0.2",
             "@sap/ui5-builder-webide-extension": "1.0.x",
             "ui5-task-zipper": "^0.3.1",
-            "mbt": "^1.0.15"
+            "mbt": ">=1.2.49"
         },
         "ui5": {
             "dependencies": [

@@ -1,8 +1,30 @@
 {
     "id": "cf-deploy",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "name": "cf-deploy",
     "description": "Install tooling for deploying to Cloud Foundry",
+
+    "options": {
+
+        "mbtVersion": {
+            "type": "string",
+            "proposals": [
+                "1.2.49"
+            ],
+            "default": "1.2.49",
+            "description": "Exact mbt (Cloud MTA Build Tool) version to install"
+        },
+
+        "cfCliPackage": {
+            "type": "string",
+            "proposals": [
+                "cf8-cli",
+                "cf7-cli"
+            ],
+            "default": "cf8-cli",
+            "description": "Cloud Foundry CLI Debian package to install"
+        }
+    },
 
     "dependsOn": {
         "ghcr.io/devcontainers/features/node:1": { }

@@ -9,11 +9,10 @@
         "version": {
             "type": "string",
             "proposals": [
-                "^9",
-                "^8"
+                "10.1.1"
             ],
-            "default": "latest",
-            "description": "Select the @sap/cds-dk version"
+            "default": "10.1.1",
+            "description": "Exact @sap/cds-dk version to install (ranges and 'latest' are rejected)"
         }
     },
 

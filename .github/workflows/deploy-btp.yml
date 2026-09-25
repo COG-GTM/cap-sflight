@@ -57,6 +57,9 @@ on:
 permissions:
   contents: read
 
+env:
+  MBT_VERSION: '1.2.49'
+
 jobs:
 
   deployment:
@@ -70,14 +73,13 @@ jobs:
       CF_API: ${{ inputs.cf-api }}
       CF_ORG: ${{ inputs.cf-org }}
       CF_SPACE: ${{ inputs.cf-space }}
-      CF_USERNAME: ${{ secrets.username }}
-      CF_PASSWORD: ${{ secrets.password }}
-      GRANT_USERS: ${{ secrets.grant-users }}
     outputs:
       ui_app_url: ${{ steps.deploy.outputs.url }}
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - uses: actions/setup-node@v4
       with:
         node-version: 16
@@ -89,11 +91,14 @@ jobs:
 
     - name: MTA build
       if: steps.cache.outputs.cache-hit != 'true'
-      run: npx mbt build -s ${{ inputs.mta-source-dir }} -t ${{ inputs.mtar-dir }} --mtar ${{ inputs.mtar-file }}
+      run: npx --yes mbt@${{ env.MBT_VERSION }} build -s ${{ inputs.mta-source-dir }} -t ${{ inputs.mtar-dir }} --mtar ${{ inputs.mtar-file }}
 
     - name: CF Deploy
       id: deploy
       uses: ./.github/actions/cf-deploy
+      env:
+        CF_USERNAME: ${{ secrets.username }}
+        CF_PASSWORD: ${{ secrets.password }}
       with:
         createspace: true
         mtafile: ${{ inputs.mtar-dir }}/${{ inputs.mtar-file }}
@@ -101,6 +106,10 @@ jobs:
 
     - name: Assign Roles
       uses: ./.github/actions/btp
+      env:
+        CF_USERNAME: ${{ secrets.username }}
+        CF_PASSWORD: ${{ secrets.password }}
+        GRANT_USERS: ${{ secrets.grant-users }}
       with:
         cli_url: ${{ inputs.btp-cli-url }}
         subdomain: ${{ inputs.btp-subdomain }}

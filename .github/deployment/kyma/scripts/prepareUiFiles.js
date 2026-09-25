@@ -124,7 +124,7 @@ function getXsAppTemplateJson() {
             "target": "$1",
             "destination": "overwrite-me",
             "authenticationType": "xsuaa",
-            "csrfProtection": false
+            "csrfProtection": true
           },
           {
             "source": "^/resources/(.*)$",

@@ -223,4 +223,33 @@ describe('Basic OData', () => {
     expect(res4).to.contain({ TotalPrice: '364.500', BookingFee: '5.000' })
   })
 
+  it('re-calculates green fee, trees and totals on drafts and saves them', async ()=>{
+    const Active = `/processor/Travel(TravelUUID='72757221A8E4645C17002DF03754AB66',IsActiveEntity=true)`
+    const Draft = `/processor/Travel(TravelUUID='72757221A8E4645C17002DF03754AB66',IsActiveEntity=false)`
+
+    const { data:draft } = await EDIT (Active)
+    expect(draft).to.contain({ TravelID: 4129, TotalPrice: '11008.000', BookingFee: '30.000', GoGreen: false })
+    await PATCH (Draft, { BeginDate: '2222-01-01', EndDate: '2222-01-02' })
+
+    await PATCH (Draft, { GoGreen: true })
+    await PATCH (Draft, { BookingFee: '125' })
+    const { data:green } = await GET (Draft+'?$expand=to_Booking')
+    expect(green).to.contain({ GreenFee: '13.000', TreesPlanted: 13, TotalPrice: '11115.500' })
+
+    const booking = green.to_Booking[0]
+    await PATCH (`/processor/Booking(BookingUUID='${booking.BookingUUID}',IsActiveEntity=false)`, { FlightPrice: Number(booking.FlightPrice) + 100 })
+    const { data:afterBooking } = await GET (Draft)
+    expect(afterBooking).to.contain({ GreenFee: '13.000', TreesPlanted: 13, TotalPrice: '11215.500' })
+    expect(new Date(afterBooking.LastChangedAt) > new Date(green.LastChangedAt)).to.be.true
+
+    await PATCH (Draft, { GoGreen: false })
+    const { data:noGreen } = await GET (Draft)
+    expect(noGreen).to.contain({ GreenFee: '0.000', TreesPlanted: 0, TotalPrice: '11202.500' })
+
+    await PATCH (Draft, { GoGreen: true })
+    await SAVE (Draft)
+    const { data:saved } = await GET (Active)
+    expect(saved).to.contain({ GoGreen: true, GreenFee: '13.000', TreesPlanted: 13, TotalPrice: '11215.500' })
+  })
+
 })

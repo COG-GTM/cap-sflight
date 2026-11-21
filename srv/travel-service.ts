@@ -55,14 +55,16 @@ export class TravelService extends cds.ApplicationService { init() {
     await next() // actually UPDATE or DELETE the subject entity
     // Trees-for-Tickets fee and totals in one statement. SET expressions read the pre-update row,
     // so TotalPrice uses the new green fee expression instead of the GreenFee column.
+    // Raw SQL skips managed fields, so LastChangedAt/By are set as a CQL UPDATE would.
     await cds.run(`UPDATE ${Travel.drafts} SET
+       LastChangedAt = ?, LastChangedBy = ?,
        GreenFee = CASE WHEN GoGreen = true THEN round(BookingFee * 0.1, 0) ELSE 0 END,
        TreesPlanted = CASE WHEN GoGreen = true THEN round(BookingFee * 0.1, 0) ELSE 0 END,
        TotalPrice = coalesce (BookingFee,0)
      + coalesce(CASE WHEN GoGreen = true THEN round(BookingFee * 0.1, 0) ELSE 0 END,0)
      + ( SELECT coalesce (sum(FlightPrice),0) from ${Booking.drafts} where to_Travel_TravelUUID = TravelUUID )
      + ( SELECT coalesce (sum(Price),0) from ${Supplements.drafts} where to_Travel_TravelUUID = TravelUUID )
-    WHERE TravelUUID = ?`, [travel])
+    WHERE TravelUUID = ?`, [cds.context!.timestamp.toISOString(), cds.context!.user.id, travel])
   }
 
 

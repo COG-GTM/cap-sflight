@@ -53,28 +53,16 @@ export class TravelService extends cds.ApplicationService { init() {
     if (fields && !fields.some(f => f in req.data)) return next() //> skip if no relevant data changed
     const travel = (req.data as Travel).TravelUUID || ( await SELECT.one `to_Travel.TravelUUID as id` .from (req.subject) ).id
     await next() // actually UPDATE or DELETE the subject entity
-    await update_totalsGreen(travel);
-    await cds.run(`UPDATE ${Travel.drafts} SET TotalPrice = coalesce (BookingFee,0)
-     + coalesce(GreenFee,0)
+    // Trees-for-Tickets fee and totals in one statement. SET expressions read the pre-update row,
+    // so TotalPrice uses the new green fee expression instead of the GreenFee column.
+    await cds.run(`UPDATE ${Travel.drafts} SET
+       GreenFee = CASE WHEN GoGreen = true THEN round(BookingFee * 0.1, 0) ELSE 0 END,
+       TreesPlanted = CASE WHEN GoGreen = true THEN round(BookingFee * 0.1, 0) ELSE 0 END,
+       TotalPrice = coalesce (BookingFee,0)
+     + coalesce(CASE WHEN GoGreen = true THEN round(BookingFee * 0.1, 0) ELSE 0 END,0)
      + ( SELECT coalesce (sum(FlightPrice),0) from ${Booking.drafts} where to_Travel_TravelUUID = TravelUUID )
      + ( SELECT coalesce (sum(Price),0) from ${Supplements.drafts} where to_Travel_TravelUUID = TravelUUID )
     WHERE TravelUUID = ?`, [travel])
-  }
-
-  /**
-   * Trees-for-Tickets: helper to update totals including green flight fee
-   */
-  async function update_totalsGreen(TravelUUID: string) {
-    const { GoGreen } = await SELECT.one .from(Travel.drafts) .columns('GoGreen') .where({ TravelUUID })
-    if (GoGreen) {
-      await UPDATE(Travel.drafts, TravelUUID)
-        .set `GreenFee = round(BookingFee * 0.1, 0)`
-        .set `TreesPlanted = round(BookingFee * 0.1, 0)`
-    } else {
-      await UPDATE(Travel.drafts, TravelUUID)
-        .set `GreenFee = 0`
-        .set `TreesPlanted = 0`
-    }
   }
 
 
